@@ -6,14 +6,13 @@
         <authors>Legato-Dev</authors>
         <licenseUrl>https://github.com/Legato-Dev/AlbumArtExtraction/blob/master/LICENSE</licenseUrl>
         <projectUrl>https://github.com/Legato-Dev/AlbumArtExtraction</projectUrl>
-        <iconUrl>https://github.com/Legato-Dev/Legato/raw/master/logo64.png</iconUrl>
+        <iconUrl>https://github.com/Legato-Dev/AlbumArtExtraction/raw/master/logo64.png</iconUrl>
         <requireLicenseAcceptance>true</requireLicenseAcceptance>
         <description>A .NET library extracts album art from metadata such as FLAC, ID3, etc.</description>
         <tags>ID3 MP3 FLAC AlbumArt Extraction NowPlaying CSharp</tags>
     </metadata>
     <files>
-        <file src="bin\Release\AlbumArtExtraction.dll" target="lib\net46\AlbumArtExtraction.dll" />
-        <file src="bin\Release\AlbumArtExtraction.pdb" target="lib\net46\AlbumArtExtraction.pdb" />
-        <file src="bin\Release\AlbumArtExtraction.xml" target="lib\net46\AlbumArtExtraction.xml" />
+        <file src="bin\Release\AlbumArtExtraction.pdb" target="lib\net461\AlbumArtExtraction.pdb" />
+        <file src="bin\Release\AlbumArtExtraction.xml" target="lib\net461\AlbumArtExtraction.xml" />
     </files>
 </package>

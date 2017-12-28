@@ -11,7 +11,7 @@ namespace AlbumArtExtraction {
 		/// <summary>
 		/// アルバムアートのようなファイル名のFileInfo一覧を取得します
 		/// </summary>
-		/// <param name="directoryFiles"></param>
+		/// <param name="directory"></param>
 		private IEnumerable<FileInfo> _GetFilesLikeAlbumArts(DirectoryInfo directory) =>
 			from i in directory.GetFiles()
 			where i.Extension == ".png" || i.Extension == ".jpeg" || i.Extension == ".jpg" || i.Extension == ".bmp"

@@ -12,7 +12,7 @@ namespace AlbumArtExtraction {
 		}
 
 		/// <summary>
-		/// 指定した長さのデータを List<byte> として読み取ります
+		/// 指定した長さのデータを List&lt;byte&gt; として読み取ります
 		/// </summary>
 		/// <param name="stream">対象の Stream</param>
 		/// <param name="count">読み取るデータの長さ(バイト数)</param>
