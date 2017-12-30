@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using AlbumArtExtraction.Flac;
 
 namespace AlbumArtExtraction {
 	/// <summary>
@@ -122,6 +121,32 @@ namespace AlbumArtExtraction {
 
 				return (picture != null) ? _ParsePictureMetaData(picture) : null;
 			}
+		}
+
+		public class MetaData {
+			public MetaData(MetaDataType type, bool isLast, List<byte> data) {
+				Type = type;
+				IsLast = isLast;
+				Data = data;
+			}
+
+			public MetaDataType Type { get; set; }
+
+			public bool IsLast { get; set; }
+
+			public List<byte> Data { get; set; }
+
+			public override string ToString() => $"FlacMetaData {{ Type = {Type}, IsLast = {IsLast}, DataSize = {Data.Count} }}";
+		}
+
+		public enum MetaDataType {
+			STREAMINFO = 0,
+			PADDING = 1,
+			APPLICATION = 2,
+			SEEKTABLE = 3,
+			VORBIS_COMMENT = 4,
+			CUESHEET = 5,
+			PICTURE = 6
 		}
 	}
 }
