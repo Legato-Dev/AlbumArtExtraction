@@ -22,56 +22,53 @@ namespace AlbumArtExtraction
 		/// <summary>
 		/// ID3v2.2 タグから Image を取り出します
 		/// </summary>
-		private Image _ParsePictureID3v22Tag(string filePath)
+		private Image _ReadPictureInFrameHeaders(FileStream file)
 		{
-			using (var file = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+			var count = 0;
+			while (count++ < 70)
 			{
-				// ID3 Header 
-				Helper.Skip(file, 6);
+				// Frame Name
+				var frameName = Helper.ReadAsAsciiString(file, 3);
 
-				// 各バイトの最上位ビットを無視した 28 ビット を算出
-				var ID3Size = (Helper.ReadAsByte(file) << 21) + (Helper.ReadAsByte(file) << 14) + (Helper.ReadAsByte(file) << 7) + Helper.ReadAsByte(file);
+				// 有効な Frame Name であるかどうかを示す
+				var validName = Regex.IsMatch(frameName, "^[A-Z0-9]+$");
 
-				// v2.2 に関しては、Extreme Header は存在しない模様。
+				// 無効な Frame Name であれば、ループ終了
+				if (!validName) break;
 
-				// Frame Header
-				var count = 0;
-				while (count++ < 70)
+				Debug.WriteLine($"frameName = {frameName}");
+				var frameSize = Helper.ReadAsUInt(file, 3);
+
+				// PIC Frame の判定
+				if (frameName == "PIC")
 				{
-					// フレーム名
-					var format = Helper.ReadAsAsciiString(file, 3);
+					// 1Byte: 文字コード, 3Byte: フォーマット, 1Byte: 種別は必ず存在する為、読み飛ばす
+					Helper.Skip(file, 5);
 
-					// フレーム終端情報の検査用
-					var reg = Regex.IsMatch(format, "^[A-Z0-9]+$");
+					// 説明文を読み飛ばす (終端文字含む)
+					var length = 1;
+					while ((Helper.ReadAsByte(file) != 0x00U))
+						length++;
 
-					// 読んだデータがフレームの終端であれば、ループ終了
-					if (!reg) break;
+					var imageSource = Helper.ReadAsByteList(file, (int)frameSize - (5 + length));
 
-					Debug.WriteLine($"format = {format}");
-					var frameSize = Helper.ReadAsUInt(file, 3);
-
-					// フォーマット判定
-					if (format == "PIC")
+					// byte データを画像として変換する
+					using (var memory = new MemoryStream())
 					{
-						// 1Byte: 文字コード, 3Byte: フォーマット, 1Byte: 種別は必ず存在する為、読み飛ばす
-						Helper.Skip(file, 5);
+						memory.Write(imageSource.ToArray(), 0, imageSource.Count);
 
-						// 説明文を読み飛ばす (終端文字含む)
-						var length = 1;
-						while ((Helper.ReadAsByte(file) != 0x00U))
-							length++;
-
-						// byte データを画像として変換する
-						var memory = new MemoryStream(Helper.ReadAsByteList(file, (int)frameSize - (5 + length)).ToArray());
-						return Image.FromStream(memory);
+						using (var image = Image.FromStream(memory))
+						{
+							return new Bitmap(image);
+						}
 					}
-
-					// PIC でないフレームのため、フレーム自体を読み飛ばす
-					Helper.Skip(file, (int)frameSize);
 				}
 
-				return null;
+				// PIC Frame でないため、フレーム自体を読み飛ばす
+				Helper.Skip(file, (int)frameSize);
 			}
+
+			return null;
 		}
 
 		#endregion
@@ -84,8 +81,7 @@ namespace AlbumArtExtraction
 		public bool CheckType(string filePath)
 		{
 			using (var file = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-				return (Helper.ReadAsAsciiString(file, 3) == "ID3" &&
-					Helper.ReadAsUShort(file) == 0x0200U) ? true : false;
+				return (Helper.ReadAsAsciiString(file, 3) == "ID3" && Helper.ReadAsUShort(file) == 0x0200U);
 		}
 
 		/// <summary>
@@ -93,7 +89,16 @@ namespace AlbumArtExtraction
 		/// </summary>
 		public Image Extract(string filePath)
 		{
-			return _ParsePictureID3v22Tag(filePath);
+			using (var file = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+			{
+				// ID3 Header 
+				Helper.Skip(file, 10);
+
+				// v2.2 に関しては、ID3 Extended Header や、そのフラグは存在しない模様。
+
+				// Frame Headers
+				return _ReadPictureInFrameHeaders(file);
+			}
 		}
 
 		#endregion
