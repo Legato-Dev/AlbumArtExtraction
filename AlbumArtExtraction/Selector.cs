@@ -21,7 +21,7 @@ namespace AlbumArtExtraction {
 
 			var extractors = new List<IAlbumArtExtractor> {
 				new FlacAlbumArtExtractor(),
-				// new ID3v23AlbumArtExtractor(),
+				new ID3v22AlbumArtExtractor(),
 				new DirectoryAlbumArtExtractor()
 			};
 			var extractor = extractors.Find(i => i.CheckType(filePath));
