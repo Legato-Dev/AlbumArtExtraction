@@ -43,7 +43,7 @@
     <Compile Include="Helper.cs" />
     <Compile Include="IAlbumArtExtractor.cs" />
     <Compile Include="FlacAlbumArtExtractor.cs" />
-    <Compile Include="Mp3\MetaDataType.cs" />
+    <Compile Include="ID3v22AlbumArtExtractor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Selector.cs" />
   </ItemGroup>
