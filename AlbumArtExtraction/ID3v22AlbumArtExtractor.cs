@@ -22,10 +22,10 @@ namespace AlbumArtExtraction
 		/// <summary>
 		/// ID3v2.2 タグから Image を取り出します
 		/// </summary>
-		private Image _ReadPictureInFrameHeaders(FileStream file)
+		private Image _ReadPictureInFrameHeaders(Stream file)
 		{
 			var count = 0;
-			while (count++ < 70)
+			while (count++ < 63)
 			{
 				// Frame Name
 				var frameName = Helper.ReadAsAsciiString(file, 3);
@@ -91,7 +91,7 @@ namespace AlbumArtExtraction
 		{
 			using (var file = new FileStream(filePath, FileMode.Open, FileAccess.Read))
 			{
-				// ID3 Header 
+				// ID3v2 Header 読み飛ばし
 				Helper.Skip(file, 10);
 
 				// v2.2 に関しては、ID3 Extended Header や、そのフラグは存在しない模様。
