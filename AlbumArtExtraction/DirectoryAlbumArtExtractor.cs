@@ -40,9 +40,8 @@ namespace AlbumArtExtraction {
 		/// </summary>
 		/// <exception cref="FileNotFoundException" />
 		public Image Extract(string filePath) {
-			if (!File.Exists(filePath)) {
+			if (!File.Exists(filePath))
 				throw new FileNotFoundException("指定されたファイルは存在しません");
-			}
 
 			var fileInfo = _GetFilesLikeAlbumArts(new FileInfo(filePath).Directory).ElementAt(0);
 

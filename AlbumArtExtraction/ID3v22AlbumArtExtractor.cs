@@ -58,9 +58,7 @@ namespace AlbumArtExtraction
 						memory.Write(imageSource.ToArray(), 0, imageSource.Count);
 
 						using (var image = Image.FromStream(memory))
-						{
 							return new Bitmap(image);
-						}
 					}
 				}
 

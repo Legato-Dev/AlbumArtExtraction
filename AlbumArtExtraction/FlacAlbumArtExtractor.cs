@@ -21,9 +21,8 @@ namespace AlbumArtExtraction {
 			var metaDataType = (isLastAndMetaDataType & 0x7FU);
 
 			var metaDataLength = Helper.ReadAsUInt(stream, 3);
-			if (metaDataLength == 0) {
+			if (metaDataLength == 0)
 				throw new InvalidDataException("metaDataLength が不正です");
-			}
 
 			// Pictureタイプ以外はストリームから読み取らずにスキップする
 			List<byte> metaData;
@@ -42,9 +41,8 @@ namespace AlbumArtExtraction {
 		/// PICTUREタイプのメタデータから Image を取り出します
 		/// </summary>
 		private Image _ParsePictureMetaData(MetaData pictureMetaData) {
-			if (pictureMetaData.Type != MetaDataType.PICTURE) {
+			if (pictureMetaData.Type != MetaDataType.PICTURE)
 				throw new ArgumentException("このメタデータはPICTUREタイプではありません");
-			}
 
 			List<byte> imageSource;
 			using (var memory = new MemoryStream()) {
@@ -52,9 +50,8 @@ namespace AlbumArtExtraction {
 				memory.Seek(4, SeekOrigin.Begin);
 
 				var mimeTypeLength = Helper.ReadAsUInt(memory);
-				if (mimeTypeLength > 128) {
+				if (mimeTypeLength > 128)
 					throw new InvalidDataException("mimeTypeLength が不正な値です");
-				}
 
 				var explanationLength = Helper.ReadAsUInt(memory, skip: (int)mimeTypeLength);
 
@@ -65,9 +62,8 @@ namespace AlbumArtExtraction {
 			using (var memory = new MemoryStream()) {
 				memory.Write(imageSource.ToArray(), 0, imageSource.Count);
 
-				using (var image = Image.FromStream(memory)) {
+				using (var image = Image.FromStream(memory))
 					return new Bitmap(image);
-				}
 			}
 		}
 
@@ -82,11 +78,15 @@ namespace AlbumArtExtraction {
 					return false;
 			}
 
-			try {
+			try
+			{
 				if (Extract(filePath) != null)
 					return true;
 			}
-			catch { }
+			catch
+			{
+				// noop
+			}
 
 			return false;
 		}
@@ -97,9 +97,8 @@ namespace AlbumArtExtraction {
 		/// <exception cref="FileNotFoundException" />
 		/// <exception cref="InvalidDataException" />
 		public Image Extract(string filePath) {
-			if (!File.Exists(filePath)) {
+			if (!File.Exists(filePath))
 				throw new FileNotFoundException("指定されたファイルは存在しません");
-			}
 
 			using (var file = new FileStream(filePath, FileMode.Open, FileAccess.Read)) {
 				Helper.Skip(file, 4);

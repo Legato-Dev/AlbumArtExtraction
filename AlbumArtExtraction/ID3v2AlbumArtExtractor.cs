@@ -6,21 +6,21 @@ using System.Text.RegularExpressions;
 namespace AlbumArtExtraction
 {
 	/// <summary>
-	/// mp3形式(ID3v2.3) のファイルからアルバムアートを抽出する機能を表します
+	/// mp3形式(ID3v2.3/2.4) のファイルからアルバムアートを抽出する機能を表します
 	/// </summary>
-	public class ID3v23AlbumArtExtractor : IAlbumArtExtractor
+	public class ID3v2AlbumArtExtractor : IAlbumArtExtractor
 	{
 
 		#region Constractor 
 
-		public ID3v23AlbumArtExtractor() { }
+		public ID3v2AlbumArtExtractor() { }
 
 		#endregion
 
 		#region Parsing picture for ID3Tag.
 
 		/// <summary>
-		/// ID3v2.2 タグから Image を取り出します
+		/// ID3v2.3/2.4 タグから Image を取り出します
 		/// </summary>
 		private Image _ReadPictureInFrameHeaders(Stream file)
 		{
