@@ -19,9 +19,6 @@ namespace AlbumArtExtraction {
 			var isLast = (isLastAndMetaDataType & 0x80U) != 0;
 
 			var metaDataType = (isLastAndMetaDataType & 0x7FU);
-			if (metaDataType > 6) {
-				throw new InvalidDataException("metaDataType が不正です");
-			}
 
 			var metaDataLength = Helper.ReadAsUInt(stream, 3);
 			if (metaDataLength == 0) {
