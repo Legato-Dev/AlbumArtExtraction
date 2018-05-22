@@ -15,20 +15,19 @@ namespace AlbumArtExtraction {
 		public IAlbumArtExtractor SelectAlbumArtExtractor(string filePath) {
 			//if (!File.Exists(filePath))
 			//	throw new ArgumentException("指定されたファイルパスは無効です", "filePath");
-			if (!File.Exists(filePath)) {
+			if (!File.Exists(filePath))
 				throw new FileNotFoundException("指定されたファイルは存在しません");
-			}
 
 			var extractors = new List<IAlbumArtExtractor> {
 				new FlacAlbumArtExtractor(),
-				// new ID3v23AlbumArtExtractor(),
+				new ID3v2AlbumArtExtractor(),
+				new ID3v22AlbumArtExtractor(),
 				new DirectoryAlbumArtExtractor()
 			};
 			var extractor = extractors.Find(i => i.CheckType(filePath));
 
-			if (extractor == null) {
-				throw new NotSupportedException("CurrentTrackからAlbumArtを抽出する方法が定義されていません");
-			}
+			if (extractor == null)
+				throw new NotSupportedException("指定されたファイルからAlbumArtを抽出する方法が見つかりませんでした");
 
 			return extractor;
 		}

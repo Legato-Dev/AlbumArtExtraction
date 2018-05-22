@@ -15,7 +15,12 @@ namespace AlbumArtExtraction {
 		private IEnumerable<FileInfo> _GetFilesLikeAlbumArts(DirectoryInfo directory) =>
 			from i in directory.GetFiles()
 			where i.Extension == ".png" || i.Extension == ".jpeg" || i.Extension == ".jpg" || i.Extension == ".bmp"
-			where i.Name.IndexOf(Path.GetFileNameWithoutExtension(i.Name)) != -1 || i.Name.IndexOf("folder") != -1 || i.Name.IndexOf("front") != -1 || i.Name.IndexOf("cover") != -1
+			where
+				i.Name.IndexOf(Path.GetFileNameWithoutExtension(i.Name)) != -1 ||
+				i.Name.IndexOf("folder") != -1 ||
+				i.Name.IndexOf("front") != -1 ||
+				i.Name.IndexOf("cover") != -1 ||
+				i.Name.IndexOf("album") != -1
 			orderby i.Length descending
 			select i;
 
@@ -35,9 +40,8 @@ namespace AlbumArtExtraction {
 		/// </summary>
 		/// <exception cref="FileNotFoundException" />
 		public Image Extract(string filePath) {
-			if (!File.Exists(filePath)) {
+			if (!File.Exists(filePath))
 				throw new FileNotFoundException("指定されたファイルは存在しません");
-			}
 
 			var fileInfo = _GetFilesLikeAlbumArts(new FileInfo(filePath).Directory).ElementAt(0);
 
