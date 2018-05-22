@@ -27,7 +27,7 @@ namespace AlbumArtExtraction {
 			var extractor = extractors.Find(i => i.CheckType(filePath));
 
 			if (extractor == null)
-				throw new NotSupportedException("CurrentTrackからAlbumArtを抽出する方法が定義されていません");
+				throw new NotSupportedException("指定されたファイルからAlbumArtを抽出する方法が見つかりませんでした");
 
 			return extractor;
 		}

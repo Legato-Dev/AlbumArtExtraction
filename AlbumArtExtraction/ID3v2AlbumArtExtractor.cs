@@ -7,6 +7,7 @@ namespace AlbumArtExtraction
 {
 	/// <summary>
 	/// mp3形式(ID3v2.3/2.4) のファイルからアルバムアートを抽出する機能を表します
+	/// <para>拡張ヘッダーのあるファイルには利用されません</para>
 	/// </summary>
 	public class ID3v2AlbumArtExtractor : IAlbumArtExtractor
 	{
@@ -92,13 +93,16 @@ namespace AlbumArtExtraction
 		{
 			using (var file = new FileStream(filePath, FileMode.Open, FileAccess.Read))
 			{
-				if (Helper.ReadAsAsciiString(file, 3) != "ID3" || Helper.ReadAsUShort(file) != 0x0300U)
+				var formatId = Helper.ReadAsAsciiString(file, 3);
+				var version = Helper.ReadAsUShort(file);
+				var headerFlag = Helper.ReadAsByte(file);
+
+				// フォーマット判定
+				if (!(formatId == "ID3" && (version == 0x0300U || version == 0x0400U)))
 					return false;
 
-				// extended header が無いことを示す
-				var hasNotExtendedHeader = (Helper.ReadAsByte(file) & 0x0040U) == 0;
-
-				return hasNotExtendedHeader;
+				// extended header が無い場合のみ一致と判定
+				return (headerFlag & 0x0040U) == 0;
 			}
 		}
 
