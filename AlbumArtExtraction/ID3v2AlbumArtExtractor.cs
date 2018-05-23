@@ -39,7 +39,7 @@ namespace AlbumArtExtraction
 				if (!validName) break;
 
 				Debug.WriteLine($"frameName = {frameName}");
-				var frameSize = file.ReadAsUInt(4);
+				var frameSize = file.ReadAsUInt();
 
 				// フラグ読み飛ばし
 				file.Skip(2);
