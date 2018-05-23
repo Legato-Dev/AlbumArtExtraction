@@ -40,7 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DirectoryAlbumArtExtractor.cs" />
-    <Compile Include="Helper.cs" />
+    <Compile Include="StreamExtensions.cs" />
     <Compile Include="IAlbumArtExtractor.cs" />
     <Compile Include="FlacAlbumArtExtractor.cs" />
     <Compile Include="ID3v22AlbumArtExtractor.cs" />

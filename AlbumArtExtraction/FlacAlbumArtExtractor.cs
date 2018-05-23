@@ -13,25 +13,25 @@ namespace AlbumArtExtraction {
 		/// </summary>
 		/// <param name="stream">対象の Stream</param>
 		private MetaData _ReadMetaDataBlock(Stream stream) {
-			var isLastAndMetaDataType = Helper.ReadAsByte(stream);
+			var isLastAndMetaDataType = stream.ReadAsByte();
 
 			// これが最後のメタデータブロックかどうかを示す値
 			var isLast = (isLastAndMetaDataType & 0x80U) != 0;
 
 			var metaDataType = (isLastAndMetaDataType & 0x7FU);
 
-			var metaDataLength = Helper.ReadAsUInt(stream, 3);
+			var metaDataLength = stream.ReadAsUInt(3);
 			if (metaDataLength == 0)
 				throw new InvalidDataException("metaDataLength が不正です");
 
 			// Pictureタイプ以外はストリームから読み取らずにスキップする
 			List<byte> metaData;
 			if (metaDataType == 6) {
-				metaData = Helper.ReadAsByteList(stream, (int)metaDataLength);
+				metaData = stream.ReadAsByteList((int)metaDataLength);
 			}
 			else {
 				metaData = null;
-				Helper.Skip(stream, (int)metaDataLength);
+				stream.Skip((int)metaDataLength);
 			}
 
 			return new MetaData((MetaDataType)metaDataType, isLast, metaData);
@@ -45,26 +45,23 @@ namespace AlbumArtExtraction {
 				throw new ArgumentException("このメタデータはPICTUREタイプではありません");
 
 			List<byte> imageSource;
-			using (var memory = new MemoryStream()) {
-				memory.Write(pictureMetaData.Data.ToArray(), 0, pictureMetaData.Data.Count);
-				memory.Seek(4, SeekOrigin.Begin);
-
-				var mimeTypeLength = Helper.ReadAsUInt(memory);
+			using (var memory = new MemoryStream(pictureMetaData.Data.ToArray())) {
+				memory.Skip(4);
+				var mimeTypeLength = memory.ReadAsUInt();
 				if (mimeTypeLength > 128)
 					throw new InvalidDataException("mimeTypeLength が不正な値です");
 
-				var explanationLength = Helper.ReadAsUInt(memory, skip: (int)mimeTypeLength);
+				memory.Skip((int)mimeTypeLength);
+				var explanationLength = memory.ReadAsUInt();
 
-				var imageSourceSize = Helper.ReadAsUInt(memory, skip: (int)explanationLength + 4 * 4);
-				imageSource = Helper.ReadAsByteList(memory, (int)imageSourceSize);
+				memory.Skip((int)explanationLength + 4 * 4);
+				var imageSourceSize = memory.ReadAsUInt();
+				imageSource = memory.ReadAsByteList((int)imageSourceSize);
 			}
 
-			using (var memory = new MemoryStream()) {
-				memory.Write(imageSource.ToArray(), 0, imageSource.Count);
-
+			using (var memory = new MemoryStream(imageSource.ToArray()))
 				using (var image = Image.FromStream(memory))
 					return new Bitmap(image);
-			}
 		}
 
 		/// <summary>
@@ -72,9 +69,9 @@ namespace AlbumArtExtraction {
 		/// </summary>
 		public bool CheckType(string filePath) {
 			using (var file = new FileStream(filePath, FileMode.Open, FileAccess.Read)) {
-				var fileType = Helper.ReadAsAsciiString(file, 4);
+				var formatId = file.ReadAsAsciiString(4);
 
-				if (fileType != "fLaC")
+				if (formatId != "fLaC")
 					return false;
 			}
 
@@ -101,7 +98,7 @@ namespace AlbumArtExtraction {
 				throw new FileNotFoundException("指定されたファイルは存在しません");
 
 			using (var file = new FileStream(filePath, FileMode.Open, FileAccess.Read)) {
-				Helper.Skip(file, 4);
+				file.Skip(4);
 
 				var metaDataList = new List<MetaData>();
 				MetaData metaData = null;

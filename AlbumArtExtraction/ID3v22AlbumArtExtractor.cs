@@ -28,7 +28,7 @@ namespace AlbumArtExtraction
 			while (count++ < 63)
 			{
 				// Frame Name
-				var frameName = Helper.ReadAsAsciiString(file, 3);
+				var frameName = file.ReadAsAsciiString(3);
 
 				// 有効な Frame Name であるかどうかを示す
 				var validName = Regex.IsMatch(frameName, "^[A-Z0-9]+$");
@@ -37,20 +37,20 @@ namespace AlbumArtExtraction
 				if (!validName) break;
 
 				Debug.WriteLine($"frameName = {frameName}");
-				var frameSize = Helper.ReadAsUInt(file, 3);
+				var frameSize = file.ReadAsUInt(3);
 
 				// PIC Frame の判定
 				if (frameName == "PIC")
 				{
 					// 1Byte: 文字コード, 3Byte: フォーマット, 1Byte: 種別は必ず存在する為、読み飛ばす
-					Helper.Skip(file, 5);
+					file.Skip(5);
 
 					// 説明文を読み飛ばす (終端文字含む)
 					var length = 1;
-					while ((Helper.ReadAsByte(file) != 0x00U))
+					while ((file.ReadAsByte() != 0x00U))
 						length++;
 
-					var imageSource = Helper.ReadAsByteList(file, (int)frameSize - (5 + length));
+					var imageSource = file.ReadAsByteList((int)frameSize - (5 + length));
 
 					// byte データを画像として変換する
 					using (var memory = new MemoryStream())
@@ -63,7 +63,7 @@ namespace AlbumArtExtraction
 				}
 
 				// PIC Frame でないため、フレーム自体を読み飛ばす
-				Helper.Skip(file, (int)frameSize);
+				file.Skip((int)frameSize);
 			}
 
 			return null;
@@ -79,7 +79,7 @@ namespace AlbumArtExtraction
 		public bool CheckType(string filePath)
 		{
 			using (var file = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-				return (Helper.ReadAsAsciiString(file, 3) == "ID3" && Helper.ReadAsUShort(file) == 0x0200U);
+				return (file.ReadAsAsciiString(3) == "ID3" && file.ReadAsUShort() == 0x0200U);
 		}
 
 		/// <summary>
@@ -90,7 +90,7 @@ namespace AlbumArtExtraction
 			using (var file = new FileStream(filePath, FileMode.Open, FileAccess.Read))
 			{
 				// ID3v2 Header 読み飛ばし
-				Helper.Skip(file, 10);
+				file.Skip(10);
 
 				// v2.2 に関しては、ID3 Extended Header や、そのフラグは存在しない模様。
 
