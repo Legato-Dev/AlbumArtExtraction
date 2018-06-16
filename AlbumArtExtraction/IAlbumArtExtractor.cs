@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+﻿using System.IO;
 
 namespace AlbumArtExtraction {
 	/// <summary>
@@ -6,6 +6,6 @@ namespace AlbumArtExtraction {
 	/// </summary>
 	public interface IAlbumArtExtractor {
 		bool CheckType(string filePath);
-		Image Extract(string filePath);
+		Stream Extract(string filePath);
 	}
 }

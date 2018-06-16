@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 
 namespace AlbumArtExtraction {
@@ -38,9 +37,9 @@ namespace AlbumArtExtraction {
 		}
 
 		/// <summary>
-		/// PICTUREタイプのメタデータから Image を取り出します
+		/// PICTUREタイプのメタデータから画像データの Stream を取り出します
 		/// </summary>
-		private Image _ParsePictureMetaData(MetaData pictureMetaData) {
+		private Stream _ParsePictureMetaData(MetaData pictureMetaData) {
 			if (pictureMetaData.Type != MetaDataType.PICTURE)
 				throw new ArgumentException("このメタデータはPICTUREタイプではありません");
 
@@ -59,9 +58,7 @@ namespace AlbumArtExtraction {
 				imageSource = memory.ReadAsByteList((int)imageSourceSize);
 			}
 
-			using (var memory = new MemoryStream(imageSource.ToArray()))
-				using (var image = Image.FromStream(memory))
-					return new Bitmap(image);
+			return new MemoryStream(imageSource.ToArray());
 		}
 
 		/// <summary>
@@ -93,7 +90,7 @@ namespace AlbumArtExtraction {
 		/// </summary>
 		/// <exception cref="FileNotFoundException" />
 		/// <exception cref="InvalidDataException" />
-		public Image Extract(string filePath) {
+		public Stream Extract(string filePath) {
 			if (!File.Exists(filePath))
 				throw new FileNotFoundException("指定されたファイルは存在しません");
 

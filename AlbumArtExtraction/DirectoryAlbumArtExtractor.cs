@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 
@@ -39,13 +38,18 @@ namespace AlbumArtExtraction {
 		/// アルバムアートを抽出します
 		/// </summary>
 		/// <exception cref="FileNotFoundException" />
-		public Image Extract(string filePath) {
+		public Stream Extract(string filePath) {
 			if (!File.Exists(filePath))
 				throw new FileNotFoundException("指定されたファイルは存在しません");
 
 			var fileInfo = _GetFilesLikeAlbumArts(new FileInfo(filePath).Directory).ElementAt(0);
 
-			return Image.FromFile(fileInfo.FullName);
+			using (var file = new FileStream(fileInfo.FullName, FileMode.Open, FileAccess.Read))
+			{
+				var buf = new byte[file.Length];
+				file.Read(buf, 0, buf.Length);
+				return new MemoryStream(buf);
+			}
 		}
 	}
 }

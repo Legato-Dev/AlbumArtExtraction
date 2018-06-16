@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
 
@@ -20,9 +19,9 @@ namespace AlbumArtExtraction
 		#region Parsing picture for ID3Tag.
 
 		/// <summary>
-		/// ID3v2.2 タグから Image を取り出します
+		/// ID3v2.2 タグから画像データの Stream を取り出します
 		/// </summary>
-		private Image _ReadPictureInFrameHeaders(Stream file)
+		private Stream _ReadPictureInFrameHeaders(Stream file)
 		{
 			var count = 0;
 			while (count++ < 63)
@@ -52,14 +51,7 @@ namespace AlbumArtExtraction
 
 					var imageSource = file.ReadAsByteList((int)frameSize - (5 + length));
 
-					// byte データを画像として変換する
-					using (var memory = new MemoryStream())
-					{
-						memory.Write(imageSource.ToArray(), 0, imageSource.Count);
-
-						using (var image = Image.FromStream(memory))
-							return new Bitmap(image);
-					}
+					return new MemoryStream(imageSource.ToArray());
 				}
 
 				// PIC Frame でないため、フレーム自体を読み飛ばす
@@ -85,7 +77,7 @@ namespace AlbumArtExtraction
 		/// <summary>
 		/// アルバムアートを抽出します
 		/// </summary>
-		public Image Extract(string filePath)
+		public Stream Extract(string filePath)
 		{
 			using (var file = new FileStream(filePath, FileMode.Open, FileAccess.Read))
 			{
